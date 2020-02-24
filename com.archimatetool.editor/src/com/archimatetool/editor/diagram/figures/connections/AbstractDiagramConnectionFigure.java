@@ -31,6 +31,7 @@ import com.archimatetool.editor.preferences.IPreferenceConstants;
 import com.archimatetool.editor.preferences.Preferences;
 import com.archimatetool.editor.ui.ColorFactory;
 import com.archimatetool.editor.ui.FontFactory;
+import com.archimatetool.editor.ui.TextControlRenderer;
 import com.archimatetool.editor.utils.PlatformUtils;
 import com.archimatetool.editor.utils.StringUtils;
 import com.archimatetool.model.IDiagramModelConnection;
@@ -170,8 +171,19 @@ extends RoundedPolylineConnection implements IDiagramConnectionFigure {
     }
     
     protected void setConnectionText() {
-        boolean displayName = fDiagramModelConnection.getFeatures().getBoolean(IDiagramModelConnection.FEATURE_NAME_VISIBLE, true);
-        getConnectionLabel().setText(displayName ? fDiagramModelConnection.getName().trim() : ""); //$NON-NLS-1$
+        String text = ""; //$NON-NLS-1$
+        
+        // If we are showing the label name
+        if(fDiagramModelConnection.getFeatures().getBoolean(IDiagramModelConnection.FEATURE_NAME_VISIBLE, true)) {
+            // Do we have any rendered text?
+            text = TextControlRenderer.getDefault().render(getModelConnection());
+            // No rendered text so use name
+            if(!StringUtils.isSet(text)) {
+                text = StringUtils.safeString(getModelConnection().getName().trim());
+            }
+        }
+        
+        getConnectionLabel().setText(text);
     }
 
     /**
